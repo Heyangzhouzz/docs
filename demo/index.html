@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>实现一个简单的通用表单 | 可维护性的组件化开发</title>
+    <meta name="description" content="">
+    
+    
+    <link rel="preload" href="/assets/css/0.styles.158f3a10.css" as="style"><link rel="preload" href="/assets/js/app.b5250fca.js" as="script"><link rel="preload" href="/assets/js/2.21d86827.js" as="script"><link rel="preload" href="/assets/js/4.21004876.js" as="script"><link rel="prefetch" href="/assets/js/3.22193acc.js"><link rel="prefetch" href="/assets/js/5.61ef66ce.js"><link rel="prefetch" href="/assets/js/6.81a1ae5e.js"><link rel="prefetch" href="/assets/js/7.148183e8.js">
+    <link rel="stylesheet" href="/assets/css/0.styles.158f3a10.css">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><!----> <span class="site-name">可维护性的组件化开发</span></a> <div class="links"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <!----></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><!---->  <ul class="sidebar-links"><li><a href="/" class="sidebar-link">概述</a></li><li><a href="/demo/" class="active sidebar-link">实现一个组件</a><ul class="sidebar-sub-headers"><li class="sidebar-sub-header"><a href="/demo/#示例" class="sidebar-link">示例</a></li><li class="sidebar-sub-header"><a href="/demo/#基本思路" class="sidebar-link">基本思路</a></li><li class="sidebar-sub-header"><a href="/demo/#考虑组件的状态组成" class="sidebar-link">考虑组件的状态组成</a></li><li class="sidebar-sub-header"><a href="/demo/#定义状态的数据结构" class="sidebar-link">定义状态的数据结构</a></li><li class="sidebar-sub-header"><a href="/demo/#创建静态ui" class="sidebar-link">创建静态UI</a></li><li class="sidebar-sub-header"><a href="/demo/#考虑并创建组件交互方式" class="sidebar-link">考虑并创建组件交互方式</a></li></ul></li></ul> </aside> <main class="page"> <div class="theme-default-content content__default"><h1 id="实现一个简单的通用表单"><a href="#实现一个简单的通用表单" aria-hidden="true" class="header-anchor">#</a> 实现一个简单的通用表单</h1> <h2 id="示例"><a href="#示例" aria-hidden="true" class="header-anchor">#</a> 示例</h2> <img src="/assets/img/demo.e1e99c49.png" width="400"> <h2 id="基本思路"><a href="#基本思路" aria-hidden="true" class="header-anchor">#</a> 基本思路</h2> <ol><li>考虑组件的状态组成</li> <li>定义状态的数据结构</li> <li>创建静态UI</li> <li>考虑并创建组件交互方式</li></ol> <h2 id="考虑组件的状态组成"><a href="#考虑组件的状态组成" aria-hidden="true" class="header-anchor">#</a> 考虑组件的状态组成</h2> <p>分析该组件哪些数据是内部定义的，哪些数据是外部传入的。此步骤更加适用于业务型的组件，该组件为通用组件尽量都是可配的。</p> <h2 id="定义状态的数据结构"><a href="#定义状态的数据结构" aria-hidden="true" class="header-anchor">#</a> 定义状态的数据结构</h2> <p>通过ui和交互逻辑定义配置项的数据结构</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">private</span> formConfig<span class="token punctuation">:</span>any <span class="token operator">=</span> <span class="token punctuation">{</span>
+  formItem<span class="token punctuation">:</span> <span class="token punctuation">[</span>
+    <span class="token punctuation">{</span>
+      key<span class="token punctuation">:</span> <span class="token string">'cardholderName'</span><span class="token punctuation">,</span>
+      type<span class="token punctuation">:</span> <span class="token string">'text'</span><span class="token punctuation">,</span>
+      disable<span class="token punctuation">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+      label<span class="token punctuation">:</span> <span class="token string">'持卡人'</span><span class="token punctuation">,</span>
+      value<span class="token punctuation">:</span> <span class="token string">''</span><span class="token punctuation">,</span>
+      rightIcon<span class="token punctuation">:</span> <span class="token string">'notice'</span><span class="token punctuation">,</span>
+      rule<span class="token punctuation">:</span> <span class="token punctuation">[</span>
+        <span class="token punctuation">{</span> type<span class="token punctuation">:</span> <span class="token string">''</span><span class="token punctuation">,</span> message<span class="token punctuation">:</span> <span class="token string">''</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token punctuation">{</span> type<span class="token punctuation">:</span> <span class="token string">''</span><span class="token punctuation">,</span> message<span class="token punctuation">:</span> <span class="token string">''</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+      <span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">{</span>
+      key<span class="token punctuation">:</span> <span class="token string">'bankCardNo'</span><span class="token punctuation">,</span>
+      type<span class="token punctuation">:</span> <span class="token string">'text'</span><span class="token punctuation">,</span>
+      label<span class="token punctuation">:</span> <span class="token string">'卡号'</span><span class="token punctuation">,</span>
+      value<span class="token punctuation">:</span> <span class="token string">''</span><span class="token punctuation">,</span>
+      maxlength<span class="token punctuation">:</span> <span class="token string">'23'</span><span class="token punctuation">,</span>
+      placeholder<span class="token punctuation">:</span> <span class="token string">'请输入卡号'</span><span class="token punctuation">,</span>
+      rightIcon<span class="token punctuation">:</span> <span class="token string">''</span><span class="token punctuation">,</span>
+      rule<span class="token punctuation">:</span> <span class="token punctuation">[</span>
+        <span class="token punctuation">{</span> type<span class="token punctuation">:</span> <span class="token string">''</span><span class="token punctuation">,</span> message<span class="token punctuation">:</span> <span class="token string">''</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token punctuation">{</span> type<span class="token punctuation">:</span> <span class="token string">''</span><span class="token punctuation">,</span> message<span class="token punctuation">:</span> <span class="token string">''</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+      <span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">{</span>
+      key<span class="token punctuation">:</span> <span class="token string">'bankCardNo'</span><span class="token punctuation">,</span>
+      type<span class="token punctuation">:</span> <span class="token string">'text'</span><span class="token punctuation">,</span>
+      label<span class="token punctuation">:</span> <span class="token string">'所属银行'</span><span class="token punctuation">,</span>
+      disable<span class="token punctuation">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+      value<span class="token punctuation">:</span> <span class="token string">''</span><span class="token punctuation">,</span>
+      rule<span class="token punctuation">:</span> <span class="token punctuation">[</span>
+        <span class="token punctuation">{</span> type<span class="token punctuation">:</span> <span class="token string">''</span><span class="token punctuation">,</span> message<span class="token punctuation">:</span> <span class="token string">''</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token punctuation">{</span> type<span class="token punctuation">:</span> <span class="token string">''</span><span class="token punctuation">,</span> message<span class="token punctuation">:</span> <span class="token string">''</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+      <span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">{</span>
+      key<span class="token punctuation">:</span> <span class="token string">'phone'</span><span class="token punctuation">,</span>
+      type<span class="token punctuation">:</span> <span class="token string">'tel'</span><span class="token punctuation">,</span>
+      placeholder<span class="token punctuation">:</span> <span class="token string">'请输入银行预留手机号'</span><span class="token punctuation">,</span>
+      label<span class="token punctuation">:</span> <span class="token string">'手机号'</span><span class="token punctuation">,</span>
+      value<span class="token punctuation">:</span> <span class="token string">''</span><span class="token punctuation">,</span>
+      rule<span class="token punctuation">:</span> <span class="token punctuation">[</span>
+        <span class="token punctuation">{</span> type<span class="token punctuation">:</span> <span class="token string">''</span><span class="token punctuation">,</span> message<span class="token punctuation">:</span> <span class="token string">''</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token punctuation">{</span> type<span class="token punctuation">:</span> <span class="token string">''</span><span class="token punctuation">,</span> message<span class="token punctuation">:</span> <span class="token string">''</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+      <span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">{</span>
+      key<span class="token punctuation">:</span> <span class="token string">'smsCaptcha'</span><span class="token punctuation">,</span>
+      type<span class="token punctuation">:</span> <span class="token string">'verifyCode'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token punctuation">]</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span>
+</code></pre></div><h2 id="创建静态ui"><a href="#创建静态ui" aria-hidden="true" class="header-anchor">#</a> 创建静态UI</h2> <p>根据配置项编写静态UI</p> <div class="language-html extra-class"><pre class="language-html"><code><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>template</span><span class="token punctuation">&gt;</span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">&quot;</span>form<span class="token punctuation">&quot;</span></span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>ul</span>
+      <span class="token attr-name">v-if</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">&quot;</span>formConfig<span class="token punctuation">&quot;</span></span>
+      <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">&quot;</span>phoneNo1<span class="token punctuation">&quot;</span></span>
+      <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">&quot;</span>bank-detail<span class="token punctuation">&quot;</span></span>
+    <span class="token punctuation">&gt;</span></span>
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>li</span>
+        <span class="token attr-name">v-for</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">&quot;</span>item in formConfig.formItem<span class="token punctuation">&quot;</span></span>
+        <span class="token attr-name">:key</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">&quot;</span>item.key<span class="token punctuation">&quot;</span></span>
+        <span class="token attr-name">:class</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">&quot;</span>[item.className]<span class="token punctuation">&quot;</span></span>
+      <span class="token punctuation">&gt;</span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>template</span> <span class="token attr-name">v-if</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">&quot;</span>['text','tel'].indexOf(item.type)&gt;-1<span class="token punctuation">&quot;</span></span><span class="token punctuation">&gt;</span></span>
+          <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>label</span> <span class="token attr-name">:for</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">&quot;</span>item.key<span class="token punctuation">&quot;</span></span><span class="token punctuation">&gt;</span></span>{{ item.label }}<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>label</span><span class="token punctuation">&gt;</span></span>
+          <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span>
+            <span class="token attr-name">:id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">&quot;</span>item.key<span class="token punctuation">&quot;</span></span>
+            <span class="token attr-name">:type</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">&quot;</span>item.type<span class="token punctuation">&quot;</span></span>
+            <span class="token attr-name">:value</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">&quot;</span>item.value<span class="token punctuation">&quot;</span></span>
+            <span class="token attr-name">:disabled</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">&quot;</span>item.disable<span class="token punctuation">&quot;</span></span>
+            <span class="token attr-name">:maxlength</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">&quot;</span>item.maxlength<span class="token punctuation">&quot;</span></span>
+            <span class="token attr-name">:placeholder</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">&quot;</span>item.placeholder<span class="token punctuation">&quot;</span></span>
+            <span class="token attr-name">@blur</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">&quot;</span>blurCheck(item.key,item.rule)<span class="token punctuation">&quot;</span></span>
+            <span class="token attr-name">@input</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">&quot;</span>inputChange(item.key)<span class="token punctuation">&quot;</span></span>
+            <span class="token attr-name">@focus</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">&quot;</span>inputFocus(item.key)<span class="token punctuation">&quot;</span></span>
+          <span class="token punctuation">&gt;</span></span>
+          <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>i</span>
+            <span class="token attr-name">v-if</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">&quot;</span>item.rightIcon<span class="token punctuation">&quot;</span></span>
+            <span class="token attr-name">:class</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">&quot;</span>['icon','loanicon',`loanicon-${item.rightIcon}`]<span class="token punctuation">&quot;</span></span>
+            <span class="token attr-name">@click</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">&quot;</span>iconClick(item.key)<span class="token punctuation">&quot;</span></span>
+          <span class="token punctuation">/&gt;</span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>template</span><span class="token punctuation">&gt;</span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>template</span> <span class="token attr-name">v-else-if</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">&quot;</span>item.type==='verifyCode'<span class="token punctuation">&quot;</span></span><span class="token punctuation">&gt;</span></span>
+          <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>label</span> <span class="token attr-name">for</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">&quot;</span>verifyCode<span class="token punctuation">&quot;</span></span><span class="token punctuation">&gt;</span></span>验证码<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>label</span><span class="token punctuation">&gt;</span></span>
+          <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span>
+            <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">&quot;</span>verifyCode<span class="token punctuation">&quot;</span></span>
+            <span class="token attr-name">v-model</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">&quot;</span>verifyCode<span class="token punctuation">&quot;</span></span>
+            <span class="token attr-name">placeholder</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">&quot;</span>请输入验证码<span class="token punctuation">&quot;</span></span>
+            <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">&quot;</span>number<span class="token punctuation">&quot;</span></span>
+            <span class="token attr-name">maxlength</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">&quot;</span>6<span class="token punctuation">&quot;</span></span>
+            <span class="token attr-name">autocomplete</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">&quot;</span>off<span class="token punctuation">&quot;</span></span>
+            <span class="token attr-name">@blur</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">&quot;</span>blurCheck(item.key,item.rule)<span class="token punctuation">&quot;</span></span>
+            <span class="token attr-name">@input</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">&quot;</span>inputChange(item.key)<span class="token punctuation">&quot;</span></span>
+            <span class="token attr-name">@focus</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">&quot;</span>inputFocus(item.key)<span class="token punctuation">&quot;</span></span>
+          <span class="token punctuation">&gt;</span></span>
+          <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>span</span>
+            <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">&quot;</span>verify<span class="token punctuation">&quot;</span></span>
+            <span class="token attr-name">@click</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">&quot;</span>getVerifyCode<span class="token punctuation">&quot;</span></span>
+          <span class="token punctuation">&gt;</span></span>{{ verifyCodeStatus }}<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>span</span><span class="token punctuation">&gt;</span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>template</span><span class="token punctuation">&gt;</span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>template</span> <span class="token attr-name">v-else-if</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">&quot;</span>item.type==='custom'<span class="token punctuation">&quot;</span></span><span class="token punctuation">&gt;</span></span>
+          <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>slot</span>
+            <span class="token attr-name">:name</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">&quot;</span>item.key<span class="token punctuation">&quot;</span></span>
+            <span class="token attr-name">:item</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">&quot;</span>item<span class="token punctuation">&quot;</span></span>
+          <span class="token punctuation">/&gt;</span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>template</span><span class="token punctuation">&gt;</span></span>
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>li</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>ul</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span>
+      <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">&quot;</span>bank-submit button-fill<span class="token punctuation">&quot;</span></span>
+      <span class="token attr-name">:disabled</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">&quot;</span>!canBindCard<span class="token punctuation">&quot;</span></span>
+      <span class="token attr-name">@click</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">&quot;</span>submit<span class="token punctuation">&quot;</span></span>
+    <span class="token punctuation">&gt;</span></span>
+      {{ formConfig.sumitTxt||'提交' }}
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">&gt;</span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>template</span><span class="token punctuation">&gt;</span></span>
+</code></pre></div><h2 id="考虑并创建组件交互方式"><a href="#考虑并创建组件交互方式" aria-hidden="true" class="header-anchor">#</a> 考虑并创建组件交互方式</h2> <p>分析哪些交互在组件内部处理,哪些交互传到父级处理</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">export</span> <span class="token keyword">default</span> <span class="token keyword">class</span> <span class="token class-name">formCard</span> <span class="token keyword">extends</span> <span class="token class-name">Vue</span> <span class="token punctuation">{</span>
+  @<span class="token function">Prop</span><span class="token punctuation">(</span><span class="token punctuation">{</span> type<span class="token punctuation">:</span> Object <span class="token punctuation">}</span><span class="token punctuation">)</span> <span class="token keyword">private</span> formConfig<span class="token punctuation">:</span>any
+
+  <span class="token keyword">private</span> verifyCodeStatus<span class="token punctuation">:</span>string <span class="token operator">=</span> <span class="token string">'获取验证码'</span>
+
+  <span class="token keyword">private</span> verifyCodeHasSend<span class="token punctuation">:</span>boolean <span class="token operator">=</span> <span class="token boolean">false</span>
+
+  <span class="token keyword">private</span> <span class="token function">blurCheck</span><span class="token punctuation">(</span><span class="token parameter">key<span class="token punctuation">:</span>string</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// rule验证的代码</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">$emit</span><span class="token punctuation">(</span><span class="token string">'blurCheck'</span><span class="token punctuation">,</span> key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token keyword">private</span> <span class="token function">iconClick</span><span class="token punctuation">(</span><span class="token parameter">key<span class="token punctuation">:</span>string</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">$emit</span><span class="token punctuation">(</span><span class="token string">'iconClick'</span><span class="token punctuation">,</span> key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token keyword">private</span> <span class="token function">inputFocus</span><span class="token punctuation">(</span><span class="token parameter">key<span class="token punctuation">:</span>string</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">$emit</span><span class="token punctuation">(</span><span class="token string">'inputFocus'</span><span class="token punctuation">,</span> key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token keyword">private</span> <span class="token function">inputChange</span><span class="token punctuation">(</span><span class="token parameter">key<span class="token punctuation">:</span>string</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">$emit</span><span class="token punctuation">(</span><span class="token string">'inputChange'</span><span class="token punctuation">,</span> key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token keyword">private</span> <span class="token function">getVerifyCode</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>verifyCodeHasSend<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">return</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">let</span> countDown <span class="token operator">=</span> <span class="token number">60</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">$emit</span><span class="token punctuation">(</span><span class="token string">'getVerifyCode'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span>verifyCodeHasSend <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span>verifyCodeStatus <span class="token operator">=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>countDown<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">秒</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span>timer <span class="token operator">=</span> <span class="token function">setInterval</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+        countDown <span class="token operator">-=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>countDown <span class="token operator">&gt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+          <span class="token keyword">this</span><span class="token punctuation">.</span>verifyCodeStatus <span class="token operator">=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>countDown<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">秒</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+          <span class="token keyword">this</span><span class="token punctuation">.</span>verifyCodeStatus <span class="token operator">=</span> <span class="token string">'重新获取'</span><span class="token punctuation">;</span>
+          countDown <span class="token operator">=</span> <span class="token number">59</span><span class="token punctuation">;</span>
+          <span class="token keyword">this</span><span class="token punctuation">.</span>verifyCodeHasSend <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+          <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>timer<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            window<span class="token punctuation">.</span><span class="token function">clearInterval</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>timer<span class="token punctuation">)</span><span class="token punctuation">;</span>
+          <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token number">1000</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre></div></div> <footer class="page-edit"><!----> <!----></footer> <div class="page-nav"><p class="inner"><span class="prev">
+        ←
+        <a href="/" class="prev router-link-active">
+          概述
+        </a></span> <!----></p></div> </main></div><div class="global-ui"></div></div>
+    <script src="/assets/js/app.b5250fca.js" defer></script><script src="/assets/js/2.21d86827.js" defer></script><script src="/assets/js/4.21004876.js" defer></script>
+  </body>
+</html>
